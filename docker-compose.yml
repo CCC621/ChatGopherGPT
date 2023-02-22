@@ -7,5 +7,6 @@ services:
       - ./cmd:/go/src/cmd
     env_file:
       - ./build/.go_env
+      - ./build/.secret_keys
     tty: true
     
