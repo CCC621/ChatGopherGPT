@@ -14,5 +14,13 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+<<<<<<< Updated upstream
 # secret key file
 build/.secret_keys
+=======
+# discord bot token and openai apikey
+*.secret_env
+
+# log file
+log.txt
+>>>>>>> Stashed changes
