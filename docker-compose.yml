@@ -7,5 +7,10 @@ services:
       - ./cmd:/go/src/cmd
     env_file:
       - ./build/.go_env
+<<<<<<< Updated upstream
+      - ./build/.secret_keys
+=======
+      - ./build/.secret_env
+>>>>>>> Stashed changes
     tty: true
     
