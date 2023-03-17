@@ -4,24 +4,14 @@ RUN apk update && apk add git
 
 WORKDIR /go/src/cmd/bot
 
-RUN go mod init ChatGopherGPT
-RUN go get github.com/bwmarrin/discordgo@latest 
-RUN go get github.com/aws/aws-lambda-go/lambda 
-RUN go get github.com/huggingface/go-gpt3
-
-
-
-
-
-
-
-<<<<<<< Updated upstream
-=======
-# go mod init
+# go mod init ChatGopherGPT
 # go get github.com/bwmarrin/discordgo@latest
 # go get github.com/PullRequestInc/go-gpt3@latest
 # go install golang.org/x/tools/cmd/goimports@latest
 # go install github.com/aws/aws-lambda-go/lambda@latest
->>>>>>> Stashed changes
+
+# RUN go get github.com/aws/aws-lambda-go/lambda 
+# RUN go get github.com/huggingface/go-gpt3
+
 
 CMD ["go", "run", "main.go"]
