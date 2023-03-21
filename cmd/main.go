@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"syscall"
 	"bytes"
+	"bufio"
 	"encoding/json"
 
     "github.com/bwmarrin/discordgo"
@@ -62,10 +63,14 @@ var messages []Message
 
 func main() {
     
+	// 前回のやり取りを読み込む
+	msgInPut()
+
     // Discord Botの設定
     dg, err := discordgo.New("Bot " + token)
     if err != nil {
-        fmt.Println("Error creating Discord session: ", err)
+		log.Fatal(err)
+		return
     }
 
     // メッセージ受信時のイベントハンドラを登録
@@ -83,7 +88,9 @@ func main() {
     signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 
     // 終了シグナルが送信されるまで待機
-    fmt.Println("Bot is running...") 
+    fmt.Println("Bot is running...")
+	
+	// botを停止する
     <-quit
 
 }
@@ -95,6 +102,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
     if m.Author.ID == s.State.User.ID {
         return
     }
+	
+	if m.Content == "/print" {
+		msgOutPut()
+		return
+	}
 
     // ログファイルをオープン（存在しない場合は作成）
     file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -127,6 +139,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
     // ChatGPTからのメッセージを返信する
     s.ChannelMessageSend(m.ChannelID, msg)
+
 }
 
 func getOpenAIResponse() OpenAiResponse {
@@ -176,4 +189,57 @@ func getOpenAIResponse() OpenAiResponse {
 	})
 
 	return response
+}
+
+func msgInPut() {
+	// ファイルからjson配列のデータを読み込む
+	file, err := os.OpenFile("msg.json", os.O_APPEND|os.O_CREATE, 0644)
+    if err != nil {
+        log.Fatal(err)
+        return
+    }
+    defer file.Close()
+
+	// 構造体にマッピングする
+	scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        var message Message
+        if err := json.Unmarshal([]byte(scanner.Text()), &message); err != nil {
+            log.Fatal(err)
+            continue
+        }
+		// ファイルの中身を読み込めた場合に、一行ずつ出力する
+        // fmt.Printf("Role: %s, Content: %s\n", message.Role, message.Content)
+		messages = append(messages, message)
+    }
+
+	if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
+}
+
+func msgOutPut() {
+	
+	// チャット履歴をファイルに出力する。
+	file, err := os.OpenFile("msg.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer file.Close()
+
+	// 過去に存在したファイルの中身を消す
+    if err := file.Truncate(0); err != nil {
+        log.Fatal(err)
+        return
+    }
+
+	encoder := json.NewEncoder(file)
+	for _, message := range messages {
+		if err := encoder.Encode(message); err != nil {
+			log.Fatal(err)
+			return
+		}
+	}
 }
