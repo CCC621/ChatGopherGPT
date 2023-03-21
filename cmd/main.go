@@ -108,6 +108,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// botが入力中だと示す。
+	s.ChannelTyping(m.ChannelID)
+
     // ログファイルをオープン（存在しない場合は作成）
     file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
