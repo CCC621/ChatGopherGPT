@@ -19,3 +19,6 @@
 
 # log file
 log.txt
+
+# chatlog json
+msg.json
