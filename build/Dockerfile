@@ -2,7 +2,7 @@ FROM golang:1.19.1-alpine
 
 RUN apk update && apk add git
 
-WORKDIR /go/src/cmd/bot
+WORKDIR /go/src/cmd
 
 # go mod init ChatGopherGPT
 # go get github.com/bwmarrin/discordgo@latest
