@@ -1,0 +1,34 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    - name: Install dependencies
+      run: go mod download
+    - name: Build
+      run: go build -o app
+    - name: Deploy to AWS
+      env:
+          DISCORDTOKEN: ${{ secrets.DISCORDTOKEN }}
+          OPENAIAPIKEY: ${{ secrets.OPENAIAPIKEY }}
+          uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.AWS_EC2_HOST }}
+        username: ${{ secrets.AWS_EC2_USERNAME }}
+        key: ${{ secrets.AWS_PRIVATE_KEY }}
+        port: ${{ secrets.AWS_EC2_PORT }}
+        script: |
+          cd /home/ubuntu/app
+          mv /home/ubuntu/app/app /home/ubuntu/app/app.bak
+          mv /home/ubuntu/app/new_app /home/ubuntu/app/app
