@@ -19,10 +19,8 @@ jobs:
         go mod download
     - name: Build
       run: |
-        pwd
-        cd cmd
-        ls
-        go build -o app
+        go build -o app ./main.go
+
     - name: Deploy to AWS
       env:
           DISCORDTOKEN: ${{ secrets.DISCORDTOKEN }}
