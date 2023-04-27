@@ -19,6 +19,9 @@ jobs:
         go mod download
     - name: Build
       run: |
+        pwd
+        cd cmd
+        ls
         go build -o app
     - name: Deploy to AWS
       env:
